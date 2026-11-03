@@ -186,9 +186,9 @@ const $=document.getElementById("a"),show=h=>{$.innerHTML=h;scrollTo(0,0)};
 let S=null;
 function sv(){try{localStorage.setItem("cf1",JSON.stringify(S))}catch(e){}}
 function bind(x){return x&&(T.find(t=>t.n==x.n&&t.c==x.c)||x)}
-function home(){let sv_="";try{sv_=localStorage.getItem("cf1")}catch(e){}
+function careerForm(){
 const birthOpts=[];for(let y=2005;y<=2016;y++)birthOpts.push(`<option value=${y}${y==2010?" selected":""}>${y} (começa com ${2027-y} anos)</option>`);
-show(`<h1>⚽ Carreira de Futebol</h1>
+show(`<h1>Criar jogador</h1>
 <div class=card>
 <label>Nome do jogador</label><input id=nm placeholder="Seu nome">
 <label>Posição</label><select id=ps>${POS.map(p=>`<option>${p}</option>`)}</select>
@@ -202,7 +202,7 @@ ${Object.entries(DIFF).map(([k,v])=>`<button class="b o diff-btn${k=="normal"?" 
 </div>
 <input type=hidden id=dif value=normal>
 <button class=b onclick=start() style="margin-top:16px">▶ Criar jogador</button>
-${sv_?`<button class="b o" onclick=resume()>Continuar carreira salva</button>`:""}`)}
+<button class="b o" onclick=home()>← Voltar ao menu</button>`)}
 function pickDiff(k){const h=document.getElementById('dif');if(!h)return;h.value=k;
 document.querySelectorAll('.diff-btn').forEach(b=>b.classList.remove('on'));
 const btn=document.getElementById('diff-'+k);if(btn)btn.classList.add('on')}
@@ -374,7 +374,98 @@ show(`<h1>🏁 Fim de carreira</h1><div class=card><b>${S.name}</b> #${S.num} ·
 <h2>Estatísticas</h2><div class=card>Jogos: <b>${J}</b><br>${S.pos=="Goleiro"?`Jogos sem sofrer gol: <b>${C}</b>`:`Gols: <b>${Gl}</b> · Assistências: <b>${A}</b>`}<br>Títulos: <b>${S.titles.length}</b><br>Lesões: <b>${I}</b></div>
 <h2>🏆 Títulos</h2><div class=card>${nt.length?nt.map(n=>`<div class=r><span style="display:flex;align-items:center;gap:8px"><img src="${tImg(n)}" width=44 height=44 alt="">${n}</span><b>${tt[n]}× <span class=m>${S.titles.filter(t=>t.n==n).map(t=>t.y).join(", ")}</span></b></div>`).join(""):"Nenhum título conquistado."}</div>
 <h2>⭐ Prêmios individuais</h2><div class=card>${Object.keys(aa).length?Object.keys(aa).map(n=>`<div class=r><span style="display:flex;align-items:center;gap:8px"><img src="${tImg(n)}" width=44 height=44 alt="">${n}</span><b>${aa[n].length}× <span class=m>${aa[n].join(", ")}</span></b></div>`).join(""):"Nenhum prêmio individual."}</div><h2>Times</h2><div class="card sc"><table><tr><th>Time</th><th>Anos</th><th>J</th><th>${S.pos=="Goleiro"?"SG":"G/A"}</th></tr>${Object.keys(sp).map(k=>{const s=sp[k];return`<tr><td>${k}</td><td>${s.y[0]}${s.y.length>1?"–"+s.y[s.y.length-1]:""}</td><td>${s.g}</td><td>${S.pos=="Goleiro"?s.cs:s.go+"/"+s.as}</td></tr>`}).join("")}</table></div>
-<button class=b onclick=home()>Nova carreira</button>`)}
+<button class=b onclick=careerForm()>Nova carreira</button><button class="b o" onclick=home()>← Menu inicial</button>`)}
+// ===== MENU INICIAL =====
+const hasSave=()=>{try{return!!localStorage.getItem("cf1")}catch(e){return false}};
+function home(){const nLg=new Set(T.map(t=>t.lg)).size,nNat=Object.keys(N).length;
+show(`<div class=hero><div class=hero-ball>⚽</div><div class=hero-tag>Simulador de futebol</div><h1 class=hero-h>Carreira de Futebol</h1><p class=hero-p>Viva a vida de um jogador de futebol, da base até a aposentadoria, ou leve uma seleção até a glória da Copa do Mundo.</p></div>
+<h2>Escolha o modo</h2>
+<button class=mode onclick=careerForm()><span class=mode-ico>🏆</span><span class=mode-body><span class=mode-t>Modo Carreira</span><span class=mode-d>Crie seu jogador, escolha um ídolo e viva até 25 temporadas: treinos, lesões, transferências, títulos e prêmios individuais.</span></span><span class=mode-go>→</span></button>
+${hasSave()?`<button class="b o" onclick=resume()>▶ Continuar carreira salva</button>`:""}
+<button class=mode onclick=cwPick()><span class=mode-ico>🌎</span><span class=mode-body><span class=mode-t>Modo Copa do Mundo <em class=new>NOVO</em></span><span class=mode-d>Escolha uma seleção e conduza o torneio jogo a jogo: 32 seleções, fase de grupos, mata-mata e a tática de cada partida na sua mão.</span></span><span class=mode-go>→</span></button>
+<h2>O que é este site</h2>
+<div class=card><p style="margin:0 0 10px">Um simulador de futebol feito para jogar no navegador, de graça e sem cadastro. Cada temporada é simulada partida a partida, com tabelas de pontos corridos, chaveamentos de mata-mata e muita emoção nas decisões.</p>
+<div class=chips style="padding:0"><span class=chip>${nNat} seleções</span><span class=chip>${nLg} campeonatos</span><span class=chip>3 dificuldades</span><span class=chip>Funciona no celular</span></div>
+<p class=m style="margin:12px 0 0">Seu progresso na carreira é salvo automaticamente neste navegador.</p></div>
+<h2>Autores</h2>
+<div class="card authors"><div class=author><span class=av>S</span><div><b>Slyvok</b><div class=m>Idealização e desenvolvimento</div></div></div><div class=author><span class=av>I</span><div><b>Isaac</b><div class=m>Idealização e desenvolvimento</div></div></div></div>
+<div class=made>Feito com <span class=heart>♥</span> e muito carinho por <b>Slyvok</b> e <b>Isaac</b></div>
+<div class=copy>© ${new Date().getFullYear()} Slyvok &amp; Isaac. Todos os direitos reservados.</div>`)}
+
+// ===== MODO COPA DO MUNDO =====
+let W=null;
+const GL="ABCDEFGH",KNR={16:"Oitavas de final",8:"Quartas de final",4:"Semifinal",2:"Final"};
+const CWT={of:["🔥 Ofensiva","Ataca com tudo: mais gols, mas deixa espaços atrás.",[1.25,1.22]],eq:["⚖️ Equilibrada","Sem riscos extras. Confia no time como ele é.",[1,1]],de:["🛡️ Defensiva","Fecha a casa e sai no contra: menos gols dos dois lados.",[.78,.76]]};
+const cwStage=()=>W.stage=="grp"?`Grupo ${GL[W.ug]} · rodada ${W.day+1} de 3`:KNR[W.ko.alive.length];
+const cwHd=()=>`<div class="card ph"><div class=ph-top><div class=ph-id><div class=ph-nm>${W.me}</div><div class=m>Copa do Mundo · ${DIFF[W.diff].label.split(" ")[0]}</div></div><div class="ovr o4"><b>${N[W.me].v}</b><span>FORÇA</span></div></div><div class=ph-club><div><b>${W.over?"Fim de torneio":cwStage()}</b></div><div class=m>${W.gf} gols marcados · ${W.gc} sofridos</div></div></div>`;
+function cwPick(){const ks=Object.keys(N).sort((a,b)=>N[b].v-N[a].v);
+show(`<h1>Copa do Mundo</h1><p class=m>32 seleções, 8 grupos e mata-mata até a final. Você escolhe a tática de cada jogo.</p>
+<div class=card><label>Sua seleção</label><select id=cwn>${ks.map(k=>`<option value="${k}"${k=="Brasil"?" selected":""}>${k} · força ${N[k].v}</option>`).join("")}</select></div>
+<h2>Dificuldade <span class=m>(força dos adversários)</span></h2>
+<div class=dg>${Object.entries(DIFF).map(([k,v])=>`<button class="b o diff-btn${k=="normal"?" on":""}" id="diff-${k}" onclick="pickDiff('${k}')"><span class=d-ico>${v.label.split(" ")[1]||""}</span><b>${v.label.split(" ")[0]}</b><span class=d-txt>${{facil:"Adversários mais fracos",normal:"Força real das seleções",dificil:"Adversários mais fortes"}[k]}</span></button>`).join("")}</div>
+<input type=hidden id=dif value=normal>
+<button class=b onclick=cwStart() style="margin-top:16px">▶ Sortear grupos</button><button class="b o" onclick=home()>← Voltar ao menu</button>`)}
+function cwStart(){const me=document.getElementById("cwn").value,diff=document.getElementById("dif").value||"normal",adj={facil:-3,normal:0,dificil:3}[diff];
+const others=sh(Object.keys(N).filter(k=>k!=me)).slice(0,31).map(k=>({n:k,avg:N[k].v+adj}));
+const all=[{n:me,avg:N[me].v,me:1},...others].map(t=>[t.avg+G()*3,t]).sort((a,b)=>b[0]-a[0]).map(x=>x[1]);
+const pots=[0,1,2,3].map(p=>sh(all.slice(p*8,p*8+8)));
+const groups=[0,1,2,3,4,5,6,7].map(g=>({teams:pots.map(p=>p[g])}));
+const ug=groups.findIndex(g=>g.teams.some(t=>t.me)),gt=groups[ug].teams,i=gt.findIndex(t=>t.me);[gt[0],gt[i]]=[gt[i],gt[0]];
+groups.forEach(g=>g.rows=g.teams.map(t=>row(t.n,t.avg,t.me)));
+W={me,diff,ug,groups,day:0,stage:"grp",log:[],ko:null,last:null,gf:0,gc:0,over:false};cwHub()}
+function cwOpp(){if(W.stage=="grp")return W.groups[W.ug].teams[[1,2,3][W.day]];const a=W.ko.alive;return a[a.findIndex(t=>t.me)^1]}
+function cwHub(){const g=W.groups[W.ug],opp=cwOpp();let h=`<h1>Copa do Mundo</h1>${cwHd()}`;
+if(W.stage=="grp")h+=`<h2>Grupo ${GL[W.ug]}</h2>`+zTable([...g.rows].sort(cmpR),{});
+else h+=`<h2>Mata-mata</h2><div class=card>${W.log.filter(l=>l.ko).map(l=>`<div class="ko-r${l.ok==1?"":" out"}"><span class=ko-n>${l.r}</span><span class=ko-o>${l.opp}</span><span class=ko-s>${l.sc}</span><span class=ko-i>${l.ok==1?"✅":"❌"}</span></div>`).join("")||`<div class=m>Você está nas oitavas de final.</div>`}</div>`;
+h+=`<div class="card nextm"><div class=m>Próximo jogo · ${cwStage()}</div><div class=r><b>${W.me}</b><span class=vs>×</span><b style="text-align:right">${opp.n}</b></div><div class=r><span class=m>força ${N[W.me].v}</span><span class=m>força ${Math.round(opp.avg)}</span></div></div>
+<button class=b onclick=cwTac()>▶ Escolher tática e jogar</button><button class="b o" onclick="cwGroups(${W.ug})">📊 Ver todos os grupos</button><button class="b o" onclick=home()>Abandonar torneio</button>`;show(h)}
+function cwGroups(k){k=+k;const g=W.groups[k];
+show(`<h1>Grupos</h1><div class=tabs>${W.groups.map((_,i)=>`<button class="tab${i==k?" on":""}" onclick="cwGroups(${i})">Grupo ${GL[i]}</button>`).join("")}</div>${zTable([...g.rows].sort(cmpR),{})}<div class=legend><span><i class=zc></i>Classificados às oitavas</span></div><button class=b onclick="${W.over?"cwSum()":"cwHub()"}">← Voltar</button>`)}
+function cwTac(){const opp=cwOpp();
+show(`<h1>Tática</h1><div class="card nextm"><div class=m>${cwStage()}</div><div class=r><b>${W.me}</b><span class=vs>×</span><b style="text-align:right">${opp.n}</b></div><div class=r><span class=m>força ${N[W.me].v}</span><span class=m>força ${Math.round(opp.avg)}</span></div></div><h2>Como a seleção vai jogar?</h2>
+${Object.entries(CWT).map(([k,v])=>`<button class="b o tac" onclick="cwPlay('${k}')"><b>${v[0]}</b><span>${v[1]}</span></button>`).join("")}`)}
+function cwSim(a,b,tac){const d=Math.max(-15,Math.min(15,a-b))/9,T_=(CWT[tac]||CWT.eq)[2];return[pois(Math.max(.14,(1.3+d*.62)*T_[0])),pois(Math.max(.14,(1.3-d*.62)*T_[1]))]}
+function cwKO(a,b,tac){let[ga,gb]=cwSim(a.avg,b.avg,tac),ea=0,eb=0,pa=0,pb=0;
+if(ga==gb){const d=Math.max(-15,Math.min(15,a.avg-b.avg))/9;ea=pois(Math.max(.1,.42+d*.15));eb=pois(Math.max(.1,.42-d*.15));
+if(ea==eb){const p=.74;for(let i=0;i<5;i++){if(Math.random()<p)pa++;if(Math.random()<p)pb++}while(pa==pb){if(Math.random()<p)pa++;if(Math.random()<p)pb++}}}
+const w=ga+ea!=gb+eb?(ga+ea>gb+eb?"a":"b"):(pa>pb?"a":"b");return{ga,gb,ea,eb,pa,pb,w}}
+const cwRound=al=>{const n=[];for(let i=0;i<al.length;i+=2){const r=cwKO(al[i],al[i+1]);n.push(r.w=="a"?al[i]:al[i+1])}return n};
+const cwRest=al=>{while(al.length>1)al=cwRound(al);return al[0]};
+function cwPlay(tac){const opp=cwOpp(),me={n:W.me,avg:N[W.me].v,me:1};let L;
+if(W.stage=="grp"){const g=W.groups[W.ug],[ga,gb]=cwSim(me.avg,opp.avg,tac),oi=[1,2,3][W.day];rec(g.rows[0],g.rows[oi],ga,gb);
+const sch=[[[0,1],[2,3]],[[0,2],[1,3]],[[0,3],[1,2]]][W.day];
+W.groups.forEach((gp,gi)=>sch.forEach(([x,y])=>{if(gi==W.ug&&x==0)return;const[a,b]=cwSim(gp.teams[x].avg,gp.teams[y].avg);rec(gp.rows[x],gp.rows[y],a,b)}));
+L={round:`Grupo ${GL[W.ug]} · rodada ${W.day+1}`,opp:opp.n,ga,gb,ea:0,eb:0,pa:0,pb:0,w:ga>gb?"a":ga<gb?"b":"d"};W.day++}
+else{const a=W.ko.alive,r=cwKO(me,opp,tac);L={round:KNR[a.length],opp:opp.n,...r};
+const nx=[];for(let i=0;i<a.length;i+=2){if(a[i].me||a[i+1].me){nx.push(r.w=="a"?me2(a[i],a[i+1],true):me2(a[i],a[i+1],false));continue}const q=cwKO(a[i],a[i+1]);nx.push(q.w=="a"?a[i]:a[i+1])}W.ko.next=nx}
+const tg=L.ga+L.ea,tc=L.gb+L.eb;W.gf+=tg;W.gc+=tc;
+const ev=[];for(let i=0;i<L.ga;i++)ev.push([Math.ceil(R(1,90)),1]);for(let i=0;i<L.gb;i++)ev.push([Math.ceil(R(1,90)),0]);for(let i=0;i<L.ea;i++)ev.push([Math.ceil(R(91,120)),1]);for(let i=0;i<L.eb;i++)ev.push([Math.ceil(R(91,120)),0]);
+L.tl=ev.sort((a,b)=>a[0]-b[0]);
+W.log.push({r:L.round,opp:opp.n,sc:`${tg}-${tc}${L.pa||L.pb?` (pên ${L.pa}-${L.pb})`:""}`,ok:L.w=="a"?1:L.w=="d"?2:0,ko:W.stage=="ko"});
+W.last=L;cwRes()}
+const me2=(x,y,win)=>win?(x.me?x:y):(x.me?y:x);
+function cwRes(){const L=W.last,tg=L.ga+L.ea,tc=L.gb+L.eb,won=L.w=="a",draw=L.w=="d";
+const note=L.pa||L.pb?`Pênaltis ${L.pa} × ${L.pb}`:L.ea||L.eb?`Decidido na prorrogação`:"";
+show(`<h1>${L.round}</h1><div class="card scoreb ${won?"win":draw?"":"loss"}"><div class=sb-t>${won?"VITÓRIA":draw?"EMPATE":"DERROTA"}</div><div class=sb-r><span class=sb-n>${W.me}</span><b class=sb-s>${tg} × ${tc}</b><span class=sb-n>${L.opp}</span></div>${note?`<div class=sb-note>${note}</div>`:""}</div>
+<h2>Lances</h2><div class=card>${L.tl.length?L.tl.map(([m,me])=>`<div class="li tl${me?"":" opp"}"><span class=tm>${m>90?"90+"+(m-90)+"'":m+"'"}</span><span>⚽ Gol ${me?"do "+W.me:"do "+L.opp}</span></div>`).join(""):`<div class=m>Jogo sem gols.</div>`}</div>
+<button class=b onclick=cwAfter()>Continuar</button>`)}
+function cwAfter(){const L=W.last;
+if(W.stage=="grp"){if(W.day<3)return cwHub();
+const q=W.groups.map(gp=>[...gp.rows].sort(cmpR).slice(0,2).map(r=>gp.teams[gp.rows.indexOf(r)])),pos=[...W.groups[W.ug].rows].sort(cmpR).findIndex(r=>r.me)+1;
+const alive=[];[[0,1],[2,3],[4,5],[6,7],[1,0],[3,2],[5,4],[7,6]].forEach(([a,b])=>alive.push(q[a][0],q[b][1]));
+W.stage="ko";W.ko={alive};
+if(pos>2)return cwOut("Eliminado na fase de grupos",cwRest(alive));return cwHub()}
+const n=W.ko.next;
+if(L.w!="a")return cwOut(L.round=="Final"?"Vice-campeão":"Eliminado — "+L.round,cwRest(n));
+if(n.length==1)return cwOut("Campeão",n[0]);
+W.ko.alive=n;cwHub()}
+function cwOut(res,champ){W.over=true;W.res=res;W.champ=champ.n||champ;
+if(res=="Campeão"){const[,col]=tk("Copa do Mundo (Seleção)");return show(`<div class=cele style="--c1:${col[0]};--c2:${col[1]}"><div class=cele-bg></div><div class=cele-rays></div><div class=cele-in><div class=cele-kind>🏆 Campeão mundial</div><img class=cele-img src="${tImg("Copa do Mundo (Seleção)")}" alt=""><div class=cele-name>Copa do Mundo</div><div class=cele-sub>${W.me} · ${W.gf} gols marcados</div><button class="b cele-btn" onclick=cwSum()>Continuar</button></div></div>`)}
+cwSum()}
+function cwSum(){const camp=W.res=="Campeão";
+show(`<h1>Fim de torneio</h1>${cwHd()}<div class="card"><div class=r><b>Resultado</b><span class="badge ${camp?"gold":""}">${W.res}</span></div>${camp?"":`<div class=m style="margin-top:6px">Campeã do mundo: <b>${W.champ}</b></div>`}</div>
+<h2>Sua campanha</h2><div class=card>${W.log.map(l=>`<div class="ko-r${l.ok==1?"":l.ok==2?"":" out"}"><span class=ko-n>${l.r.replace("Grupo "+GL[W.ug]+" · ","")}</span><span class=ko-o>${l.opp}</span><span class=ko-s>${l.sc}</span><span class=ko-i>${l.ok==1?"✅":l.ok==2?"➖":"❌"}</span></div>`).join("")}</div>
+<button class=b onclick=cwPick()>Jogar de novo</button><button class="b o" onclick="cwGroups(${W.ug})">📊 Ver os grupos</button><button class="b o" onclick=home()>← Menu inicial</button>`)}
 home();
 // ========================================
 // CORREÇÃO DOS BOTÕES NO VITE
@@ -401,7 +492,16 @@ Object.assign(window, {
   summ,
   tbl,
   openTbl,
-  T
+  T,
+  careerForm,
+  cwPick,
+  cwStart,
+  cwHub,
+  cwGroups,
+  cwTac,
+  cwPlay,
+  cwAfter,
+  cwSum
 });
 
 // Disponibiliza a variável S globalmente.
@@ -412,5 +512,12 @@ Object.defineProperty(window, "S", {
 
   set: value => {
     S = value;
+  }
+});
+Object.defineProperty(window, "W", {
+  configurable: true,
+  get: () => W,
+  set: value => {
+    W = value;
   }
 });
