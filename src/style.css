@@ -454,3 +454,6 @@ input, select { background: rgba(5,16,11,.8); }
 .fz-ed .fz-c { border-style: dashed; opacity: .55; }
 .fz-edon .fz-c { opacity: 1; border-style: solid; border-color: var(--accent); background: rgba(49,223,131,.28); }
 .fz-edon .fz-c b { color: #fff; }
+.lf { display: grid; grid-template-columns: 78px 1fr 28px; align-items: center; gap: 10px; margin-top: 10px; font-size: 13px; }
+.lf span { color: var(--muted); } .lf b { text-align: right; }
+.b small { display: block; }

@@ -158,7 +158,6 @@ ${list.map(id=>`<div class=card style="cursor:pointer" onclick="idolSet('${id.n.
 function idolSet(nome,sk){S.idol=nome;S.idolSk=sk;skPick()}
 function skPick(){const K=S.pos=="Goleiro"?SKG:SKL,TN=TS();show(`<h1>Super habilidade</h1><p class=m>Sua identidade como jogador: dá bônus gigante de treino em uma habilidade.</p>${Object.keys(K).map(n=>`<button class=b onclick="skSet('${n}')">⭐ ${n}<br><small>Bônus gigante em ${TN[K[n]]}</small></button>`).join("")}`)}
 function skSet(n){const K=S.pos=="Goleiro"?SKG:SKL;S.sk=K[n];S.skn=n;const h=sh(T.filter(t=>t.c==S.nat)),o=sh(T),r=[];while(r.length<5){const x=(h.length&&Math.random()>.08)?h.pop():o.pop();if(!r.includes(x))r.push(x)}S.offs=r;show(`<h1>Escolha seu primeiro time</h1><p class=m>Super habilidade: ⭐ ${n}</p>${r.map((x,i)=>card(x,i,"s","Começar aqui")).join("")}`)}
-const E=[["Festa até tarde","Amigos te chamam para a balada.",[["Ir à festa",-.6,.5],["Ficar em casa",.2,.2]]],["Treino extra","O técnico oferece treinos individuais.",[["Aceitar",.6,.4],["Recusar",0,.1]]],["Lesão leve","Você sentiu a coxa no treino.",[["Tratar até o fim",-.1,.1],["Voltar rápido",-.6,1.2]]],["Nutrição","O clube sugere um nutricionista.",[["Contratar",.4,.2],["Ignorar",0,.1]]],["Polêmica com o técnico","Você discutiu no vestiário.",[["Pedir desculpas",0,.2],["Bancar a posição",-.5,.6]]],["Mídia e patrocínio","Marcas querem você em campanhas.",[["Aceitar tudo",-.3,.3],["Recusar",.2,.2]]],["Estudar vídeos","Analistas oferecem análise de jogos.",[["Estudar",.4,.3],["Descansar",.1,.1]]],["Mentoria","Um craque veterano oferece conselhos.",[["Ouvir com atenção",.5,.4],["Seguir seu caminho",0,.2]]]];
 const st=a=>{const s=a<60?1:a<65?2:a<75?3:a<85?4:5;return"★".repeat(s)+"☆".repeat(5-s)};
 // ===== motor de simulação de partidas =====
 function pois(l){let k=0,p=1,L=Math.exp(-l);do{k++;p*=Math.random()}while(p>L);return k-1}
@@ -209,7 +208,7 @@ document.querySelectorAll('.diff-btn').forEach(b=>b.classList.remove('on'));
 const btn=document.getElementById('diff-'+k);if(btn)btn.classList.add('on')}
 function resume(){try{S=JSON.parse(localStorage.getItem("cf1"));S.team=bind(S.team);S.parent=bind(S.parent);season()}catch(e){home()}}
 function start(){const nat=document.getElementById("na").value,birth=+document.getElementById("by").value,diff=document.getElementById("dif").value||"normal";
-S={name:document.getElementById("nm").value||"Craque",pos:document.getElementById("ps").value,num:+document.getElementById("nu").value||10,nat,age:2027-birth,birth,diff,ovr:50,year:2027,hist:[],titles:[],tr:{},left:5,parent:null,gain:3,ratio:.5,peak:50,out:0,sk:null,idol:null,idolSk:null};
+S={name:document.getElementById("nm").value||"Craque",pos:document.getElementById("ps").value,num:+document.getElementById("nu").value||10,nat,age:2027-birth,birth,diff,ovr:50,year:2027,hist:[],titles:[],tr:{},left:5,parent:null,gain:3,ratio:.5,peak:50,out:0,sk:null,idol:null,idolSk:null,money:.1,fame:5,mood:60,perks:{},deals:[],seen:[],q:[]};
 {const ag=S.age,ov=ag<=13?44:ag<=15?47:ag<=17?50:ag<=19?55:60,po={facil:3,normal:0,dificil:-3}[diff]||0;S.ovr=ov;S.peak=ov;S.pot=Math.max(ov+12,Math.min(93,Math.round(74+po+G()*6.5)))}
 idolPick()}
 function hd(){const t=S.team,o=Math.round(S.ovr),base=S.age<16;
@@ -219,7 +218,7 @@ return`<div class="card ph">
 <div class="ovr ${o>=85?"o5":o>=75?"o4":o>=65?"o3":"o2"}"><b>${o}</b><span>OVR</span></div>
 </div>
 <div class=ph-club><div><b>${t.n}</b><div class=m>${t.lg} · ${t.c}</div></div><div style="text-align:right"><span class=s>${st(t.avg)}</span><div class=m>força ${t.avg}</div></div></div>
-<div class=chips>${base?'<span class="chip y">🧒 Categoria de base</span>':""}${S.parent?'<span class="chip">🔁 Emprestado</span>':""}${S.idol?`<span class=chip>🌟 ${S.idol}</span>`:""}${S.skn?`<span class="chip g">⭐ ${S.skn}</span>`:""}${S.out>0?'<span class="chip r">🩹 Lesionado</span>':""}</div>
+<div class=chips><span class=chip>💰 R$ ${(S.money||0).toFixed(1)}M</span>${base?'<span class="chip y">🧒 Categoria de base</span>':""}${S.parent?'<span class="chip">🔁 Emprestado</span>':""}${S.idol?`<span class=chip>🌟 ${S.idol}</span>`:""}${S.skn?`<span class="chip g">⭐ ${S.skn}</span>`:""}${S.out>0?'<span class="chip r">🩹 Lesionado</span>':""}</div>
 </div>`}
 function season(){sv();const L=S.left,TN=TS(),hs=S.hist||[],tot=hs.reduce((o,h)=>({j:o.j+(h.g||0),g:o.g+(h.go||0),a:o.a+(h.as||0),c:o.c+(h.cs||0)}),{j:0,g:0,a:0,c:0}),oo=Math.round(S.ovr);
 show(`<h1>Temporada ${S.year}</h1>${hd()}
@@ -229,6 +228,7 @@ show(`<h1>Temporada ${S.year}</h1>${hd()}
 <div class=lu-t><span>Títulos</span><b class=lu-big>${S.titles.length}</b><em>${hs.length} temporadas jogadas</em></div>
 <div class=lu-t><span>${S.pos=="Goleiro"?"Jogos sem sofrer gol":"Gols / assist."}</span><b class=lu-big>${S.pos=="Goleiro"?tot.c:tot.g+" / "+tot.a}</b><em>${tot.j} jogos na carreira</em></div>
 </div>
+${lifeCard()}
 ${hs.length>1?`<h2>Evolução</h2><div class=card><div class=r><b>OVR ao longo da carreira</b><span class=m>${hs[0].ov} → ${hs[hs.length-1].ov}</span></div><div class=spark>${hs.slice(-14).map(h=>`<div><i style="height:${Math.max(8,Math.min(100,(h.ov-40)*100/55))}%"></i><small>${String(h.y).slice(2)}</small></div>`).join("")}</div></div>`:""}
 <h2>Treinos <span class=m>(${L} de 5 restantes${S.age<=29?" · +50% jovem":""})</span></h2>
 <div class=g>${Object.keys(TN).map(k=>`<button class="b o trn${S.tr[k]?" has":""}" ${L?"":"disabled"} onclick="tr('${k}')">${TN[k]}${k==S.sk?" ⭐":""}${k==S.idolSk?" 🌟":""}${S.tr[k]?`<em>×${S.tr[k]}</em>`:""}</button>`).join("")}<button class="b o" onclick="S.tr={};S.left=5;season()">↺ Zerar</button></div>
@@ -241,11 +241,12 @@ function rk(r){return r==1?"Campeão":r==2?"Vice":r<=4?"Semifinal":r<=8?"Quartas
 function comp(me,opp,nz){const m=me+G()*nz;return 1+opp.filter(o=>o+G()*nz>m).length}
 function go(){const t=S.team,a=S.age,y=S.year,tr=S.tr,L=[],H=[];
 const eff=Math.max(-3,Math.min(3,(S.ovr-t.avg)*.12));
-const dfm=DIFF[S.diff]?.growMult||1;
+const dfm=DIFF[S.diff]?.growMult||1;lifeInit();
 let trg=0;for(const k in tr){let v=R(.2,.5)*(a<=29?1.8:.6);if(k=="fis"&&a>=30)v+=.2;if(k==S.sk)v*=1.8;if(k==S.idolSk)v*=1.25;trg+=v*tr[k]}
+if(S.perks.academia)trg+=.5;
 let ratio=Math.max(.05,Math.min(1,.55+(S.ovr-t.avg)*.04+G()*.1+(tr.int||0)*.03));if(a<17)ratio=Math.min(ratio,.6);
 if(!S.out)S.out=0;let lost=0,ig=0,ijd=0;if(S.out>0){lost=Math.min(38,S.out);S.out-=lost;L.push("🩹 Ainda em recuperação de lesão grave")}
-if(lost<38){const injM=DIFF[S.diff]?.injMult||1;const f=(a>=31?1.3:1)*(1-.04*(tr.fis||0))/injM,rr=Math.random()/f;ig=rr<.0025?5:rr<.0075?4:rr<.0195?3:rr<.0695?2:rr<.1495?1:0;
+if(lost<38){const injM=DIFF[S.diff]?.injMult||1;const f=(a>=31?1.3:1)*(1-.04*(tr.fis||0))*(S.perks.banheira?.85:1)*(S.perks.fisio?.85:1)/injM,rr=Math.random()/f;ig=rr<.0025?5:rr<.0075?4:rr<.0195?3:rr<.0695?2:rr<.1495?1:0;
 if(ig){const W=[0,1,4,10,38,76][ig],l2=Math.min(38-lost,W);lost+=l2;S.out+=W-l2;if(ig==4)ijd=R(3,6);if(ig==5)ijd=R(6,10);L.push(`🩹 Lesão grau ${ig}: ${["","1 semana","1 mês","1 trimestre","1 ano","2 anos"][ig]} sem jogar${ig>3?" e queda de OVR":""}`)}}
 let gm=Math.round(ratio*36*(38-lost)/38);const rg=ratio*(38-lost)/38;
 const CP=[];const myAvg=t.avg+eff;
@@ -305,8 +306,14 @@ const rt0=a<=17?.19:a<=22?.21:a<=25?.15:a<=28?.08:0,pe=S.pot+trg*.5+(S.sk?2:0)+(
 let gr=Math.max(0,pe-S.ovr)*rt0*(1+trg*.05)*dfm+(ratio-.55)*(a<=29?1.2:.4)+G()*.6*(a<=29?1:.5)*(tr.int?.7:1);
 if(a<=29&&S.ovr>pe)gr=Math.min(gr,.3);
 gr+=a<=29?0:(a<=31?-.3:a<=34?-.9:-(1.5+(a-35)*.4))+(a>29?trg*.12:0);
+gr+=((S.mood??60)-60)*.008+(a>=28&&S.perks.chef?.25:0);
 if(a>=35)gr=Math.min(gr,-.2);
 gr-=ijd;const o0=S.ovr;S.ovr=Math.max(40,Math.min(97,S.ovr+gr));S.gain=gr+ijd;S.ratio=ratio;S.peak=Math.max(S.peak,S.ovr);
+{const sal=Math.round(Math.max(.1,Math.pow((o0-48)/10,2)*1.2+(t.avg-55)*.05)*10)/10,dl=S.deals.reduce((q,d)=>q+d.amt,0),fi=Math.round(S.fame*.03*10)/10;
+S.money=Math.round((S.money+sal+dl+fi)*10)/10;L.push(`💰 Ganhos da temporada: R$ ${(sal+dl+fi).toFixed(1)}M (salário ${sal} + patrocínios ${(dl+fi).toFixed(1)})`);
+S.deals=S.deals.map(d=>({...d,yrs:d.yrs-1})).filter(d=>d.yrs>0);
+S.fame=Math.max(0,Math.min(100,S.fame-2+H.length*4+(g>15?3:0)));
+S.mood=Math.max(0,Math.min(100,S.mood+((S.perks.psi?72:60)-S.mood)*.2+(S.perks.casa?3:0)+(S.perks.mansao?5:0)+H.length*4))}
 H.forEach(n=>S.titles.push({y,n}));
 const AW=[];if(gm>=15){if(S.pos!="Goleiro"&&g>R(17,30))AW.push("Chuteira de Ouro");if(S.pos=="Goleiro"&&cs>R(11,16))AW.push("Luva de Ouro")}
 if(gm>=22){const lw=t.avg>=80?1:t.avg>=70?.75:.5,pf={Atacante:1,Ponta:1.15,Meia:1.35,Lateral:1.9,Volante:2.4,Zagueiro:3.2}[S.pos]||1,mj=Object.values(CN).map(v=>v[0]);
@@ -361,14 +368,81 @@ if(c.relZ!==undefined){if(c.d==1){if(p<=4)z="zc";else if(p>c.relZ)z="zr"}else{if
 else{if(p<=2)z="zc"}
 return`<tr class="${r.me?"me":""}"><td class="pz ${z}">${p}</td><td>${r.n}</td><td><b>${r.pts}</b></td><td>${r.j}</td><td>${r.v}</td><td>${r.e}</td><td>${r.d}</td><td>${r.gp-r.gc>0?"+":""}${r.gp-r.gc}</td></tr>`}).join("")}
 </table></div>`}
-function evt(){const i=Math.floor(Math.random()*E.length),e=E[i];
-show(`<h1>${e[0]}</h1><div class=card>${e[1]}</div>${e[2].map((o,j)=>`<button class=b onclick="evo(${i},${j})">${o[0]}</button>`).join("")}`)}
-function evo(i,j){const o=E[i][2][j],d=o[1]+G()*o[2];S.ovr=Math.max(40,Math.min(99,S.ovr+d));
-show(`<h1>${E[i][0]}</h1><div class=card>${o[0]}: ${d>=0?"seu OVR subiu":"seu OVR caiu"} ${Math.abs(d).toFixed(1)}.<br>OVR atual: <b>${Math.round(S.ovr)}</b></div><button class=b onclick=offers()>Ver propostas</button>`)}
+// ===== EVENTOS DE VIDA (modo jogador) =====
+const PERK={banheira:["🛁","Banheira de gelo"],academia:["🏋️","Academia em casa"],casa:["🏡","Casa com piscina"],mansao:["🏰","Mansão"],chef:["👨‍🍳","Chef pessoal"],psi:["🧠","Psicólogo esportivo"],fisio:["💆","Fisioterapeuta particular"],carro:["🏎️","Carro de luxo"]};
+const O=(t,x)=>({t,...x});
+const EV=[
+{id:"podcast",ic:"🎙️",t:"Convite para um podcast",d:"Um dos podcasts de futebol mais ouvidos do país quer você como convidado de uma edição de duas horas.",o:[O("Aceitar o convite",{fame:4,mood:3,ovr:[-.1,.2],txt:"Você foi bem na conversa e ganhou novos fãs."}),O("Aceitar e cobrar cachê",{fame:2,money:.3,txt:"O programa topou pagar e você fechou o acordo."}),O("Recusar",{mood:-1,txt:"Você preferiu focar nos treinos."})]},
+{id:"refri",ic:"🥤",t:"Marca de refrigerante quer te contratar",d:"Uma gigante de refrigerantes propõe uma campanha nacional com o seu rosto nas TVs.",min:17,o:[O("Contrato de 3 anos",{deal:{n:"Refrigerante",amt:.8,yrs:3},fame:5,mood:-1,txt:"Contrato assinado: renda extra por 3 temporadas."}),O("Só uma campanha",{money:.6,fame:2,txt:"Campanha gravada e paga na hora."}),O("Recusar (não combina com atleta)",{ovr:[.2,.2],mood:1,txt:"Você manteve a imagem de atleta focado."})]},
+{id:"chuteira",ic:"👟",t:"Patrocínio de chuteiras",d:"Uma fabricante de material esportivo oferece um contrato de patrocínio pessoal.",min:16,o:[O("Assinar contrato de 4 anos",{deal:{n:"Chuteiras",amt:.6,yrs:4},fame:3,txt:"Você agora usa a marca e recebe todo ano."}),O("Negociar um valor maior",{risk:{p:.5,deal:{n:"Chuteiras (premium)",amt:1.2,yrs:4},fame:3,txt:"A marca topou pagar mais!"},money:0,txt:"A marca recusou a contraproposta e o negócio esfriou."}),O("Ficar sem patrocínio",{mood:1,txt:"Você segue com as chuteiras do clube."})]},
+{id:"reality",ic:"📺",t:"Convite para um reality show",d:"Uma emissora quer você em um reality de celebridades durante a folga.",min:18,o:[O("Aceitar",{fame:8,money:1,ovr:[-.6,.3],mood:2,txt:"A audiência foi alta, mas o foco nos treinos caiu."}),O("Recusar",{ovr:[.1,.2],txt:"Você preferiu descansar na folga."})]},
+{id:"doc",ic:"🎬",t:"Documentário sobre sua carreira",d:"Uma plataforma de streaming quer contar a sua história em uma série documental.",min:19,ok:()=>S.fame>=25,o:[O("Participar",{fame:7,mood:4,money:.5,txt:"A série foi um sucesso e emocionou a torcida."}),O("Recusar por privacidade",{mood:1,txt:"Você manteve a vida pessoal fora dos holofotes."})]},
+{id:"capa",ic:"📰",t:"Capa de revista",d:"Uma revista de esportes quer você na capa da próxima edição.",min:17,ok:()=>S.fame>=15,o:[O("Fazer o ensaio",{fame:4,money:.2,txt:"A edição esgotou nas bancas."}),O("Recusar",{txt:"Você declinou educadamente."})]},
+{id:"game",ic:"🎮",t:"Seu rosto em um videogame",d:"A produtora de um game de futebol quer escanear você para o próximo jogo.",min:18,ok:()=>S.ovr>=65,o:[O("Aceitar a licença",{fame:5,money:.5,txt:"Você virou personagem jogável."}),O("Recusar",{txt:"Você não quis ceder a imagem."})]},
+{id:"caridade",ic:"🤝",t:"Evento beneficente",d:"Uma ONG convida você para um jogo beneficente no fim de semana.",o:[O("Participar de graça",{fame:3,mood:5,ovr:[-.1,.2],txt:"Você ajudou muita gente e se sentiu realizado."}),O("Doar e não ir",{cost:.3,fame:1,mood:2,txt:"A doação foi muito bem-vinda."}),O("Recusar",{mood:-2,txt:"Alguns torcedores acharam falta de empatia."})]},
+{id:"redes",ic:"📱",t:"Redes sociais",d:"Sua assessoria sugere aumentar a presença nas redes sociais.",min:16,o:[O("Postar com frequência",{fame:4,ovr:[-.2,.2],risk:{p:.25,fame:-3,mood:-3,txt:"Um post foi mal interpretado e virou polêmica."},txt:"Seu número de seguidores cresceu."}),O("Contratar um social media",{cost:.2,fame:3,mood:1,txt:"Seu perfil ficou profissional e sem polêmicas."}),O("Ficar fora das redes",{ovr:[.2,.2],txt:"Mais foco no que importa."})]},
+{id:"entrevista",ic:"🎤",t:"Entrevista polêmica",d:"Um repórter pergunta sobre uma briga recente no vestiário diante das câmeras.",min:17,o:[O("Responder com sinceridade",{fame:2,risk:{p:.4,fame:-4,mood:-3,txt:"Suas palavras causaram atrito no grupo."},txt:"A torcida gostou da franqueza."}),O("Resposta diplomática",{mood:1,txt:"Você saiu da saia justa sem problemas."}),O("Sair sem falar nada",{fame:-1,txt:"A imprensa não gostou, mas passou."})]},
+{id:"lazer",ic:"🏖️",t:"Seu jogador quer lazer",d:"Depois de meses de rotina pesada, você sente que precisa relaxar e investir na qualidade de vida. O que fazer com o dinheiro?",ok:()=>S.money>=.4,o:[O("Viagem de férias em família",{cost:.5,mood:14,ovr:[.1,.2],txt:"Você voltou renovado e com a cabeça no lugar."}),O("Comprar uma banheira de gelo",{cost:.4,perk:"banheira",mood:3,txt:"A recuperação pós-jogo ficou muito melhor."}),O("Casa com piscina",{cost:3,perk:"casa",mood:12,txt:"Um lar confortável para descansar e receber a família."}),O("Melhorar a academia de casa",{cost:.8,perk:"academia",mood:2,txt:"Agora você treina extra todos os dias."})]},
+{id:"chef",ic:"👨‍🍳",t:"Chef e nutrição",d:"Um chef especializado em atletas oferece um plano alimentar completo.",ok:()=>S.money>=.6&&!S.perks.chef,o:[O("Contratar o chef",{cost:.6,perk:"chef",mood:2,txt:"Seu corpo agradece: menos desgaste com a idade."}),O("Continuar como está",{txt:"Você manteve a dieta do clube."})]},
+{id:"psi",ic:"🧠",t:"Psicólogo esportivo",d:"O clube sugere acompanhamento psicológico para lidar com a pressão.",ok:()=>S.money>=.5&&!S.perks.psi,o:[O("Contratar um psicólogo",{cost:.5,perk:"psi",mood:6,txt:"Você aprendeu a lidar melhor com a pressão."}),O("Dispensar a ideia",{txt:"Você acha que dá conta sozinho."})]},
+{id:"fisio",ic:"💆",t:"Fisioterapeuta particular",d:"Um fisioterapeuta de renome se oferece para cuidar só de você.",ok:()=>S.money>=.9&&!S.perks.fisio,o:[O("Contratar",{cost:.9,perk:"fisio",mood:1,txt:"Seu corpo ficou mais protegido contra lesões."}),O("Não precisa",{txt:"Você segue com o departamento médico do clube."})]},
+{id:"carro",ic:"🏎️",t:"Carro de luxo",d:"Uma concessionária exibe um esportivo importado de edição limitada.",ok:()=>S.money>=1.2&&!S.perks.carro,o:[O("Comprar",{cost:1.2,perk:"carro",mood:6,fame:2,risk:{p:.2,fame:-3,txt:"A torcida criticou o exagero após um jogo ruim."},txt:"Você ficou realizado... e um pouco mais visado."}),O("Guardar o dinheiro",{mood:-1,txt:"Você preferiu a segurança."})]},
+{id:"mansao",ic:"🏰",t:"Mansão dos sonhos",d:"Um corretor mostra uma mansão com campo, cinema e spa.",ok:()=>S.money>=10&&!S.perks.mansao,o:[O("Comprar a mansão",{cost:10,perk:"mansao",mood:18,fame:3,txt:"A vida de luxo elevou seu moral."}),O("Ficar onde está",{txt:"Você é do tipo que não liga para luxo."})]},
+{id:"invest",ic:"📈",t:"Hora de investir",d:"Seu gerente financeiro apresenta opções para fazer o dinheiro render.",ok:()=>S.money>=1,o:[O("Renda fixa e imóveis",{money:0,txt:"Investimento seguro: um retorno de 8% sobre o caixa.",fx:s=>{S.money*=1.08}}),O("Ações de risco",{risk:{p:.45,txt:"O mercado caiu e você perdeu 25% do caixa.",fx:s=>{S.money*=.75}},txt:"Boa aposta! Seu caixa cresceu 30%.",fx:s=>{S.money*=1.3}}),O("Negócio com um amigo",{risk:{p:.5,txt:"Era um golpe. Você perdeu parte do dinheiro e do humor.",fx:s=>{S.money*=.8},mood:-5},txt:"O negócio deu certo e rendeu 20%.",fx:s=>{S.money*=1.2}})]},
+{id:"familia",ic:"👪",t:"Pedido da família",d:"Seus pais sonham com uma casa maior para a família toda.",min:18,ok:()=>S.money>=2,o:[O("Presentear com uma casa",{cost:2,mood:10,fame:1,txt:"A felicidade da família te motivou ainda mais."}),O("Ajudar com uma reforma",{cost:.6,mood:5,txt:"Todos ficaram muito felizes."}),O("Adiar o pedido",{mood:-4,txt:"Eles entenderam, mas ficaram chateados."})]},
+{id:"balada",ic:"🎉",t:"Festa até tarde",d:"Amigos te chamam para uma balada na véspera de um jogo importante.",min:16,o:[O("Ir à festa",{mood:6,ovr:[-.6,.5],risk:{p:.2,fame:-3,txt:"Alguém postou fotos suas e virou assunto."},txt:"Foi divertido, mas o corpo sentiu."}),O("Ficar em casa",{ovr:[.2,.2],mood:-1,txt:"Você descansou e chegou inteiro ao jogo."})]},
+{id:"treino",ic:"💪",t:"Treino extra",d:"O técnico oferece treinos individuais fora do horário.",o:[O("Aceitar",{ovr:[.6,.4],mood:-2,txt:"Você sentiu a evolução no físico e na técnica."}),O("Recusar",{ovr:[0,.1],txt:"Você preferiu poupar o corpo."})]},
+{id:"lesao",ic:"🩹",t:"Lesão leve",d:"Você sentiu a coxa no treino.",o:[O("Tratar até o fim",{ovr:[-.1,.1],txt:"Você parou alguns dias e voltou 100%."}),O("Voltar rápido",{ovr:[-.6,1.2],fame:1,txt:"Você forçou e correu um risco desnecessário."})]},
+{id:"nutri",ic:"🥗",t:"Nutricionista do clube",d:"O clube sugere uma consultoria nutricional.",o:[O("Contratar",{ovr:[.4,.2],txt:"Você sentiu o corpo mais leve e forte."}),O("Ignorar",{ovr:[0,.1],txt:"Você segue com a sua dieta."})]},
+{id:"tecnico",ic:"😤",t:"Polêmica com o técnico",d:"Você discutiu no vestiário.",min:17,o:[O("Pedir desculpas",{ovr:[0,.2],mood:1,txt:"A paz voltou ao grupo."}),O("Bancar a posição",{ovr:[-.5,.6],mood:-2,fame:1,txt:"O clima ficou pesado por semanas."})]},
+{id:"video",ic:"📹",t:"Estudar vídeos",d:"Analistas oferecem análise de jogos.",o:[O("Estudar",{ovr:[.4,.3],txt:"Você passou a ler melhor o jogo."}),O("Descansar",{ovr:[.1,.1],mood:2,txt:"A cabeça agradeceu o descanso."})]},
+{id:"mentor",ic:"🧓",t:"Mentoria de um veterano",d:"Um craque veterano oferece conselhos.",o:[O("Ouvir com atenção",{ovr:[.5,.4],mood:2,txt:"Você aprendeu lições valiosas."}),O("Seguir seu caminho",{ovr:[0,.2],txt:"Você prefere errar do seu jeito."})]},
+{id:"agente",ic:"🧾",t:"Troca de empresário",d:"Um agente famoso se oferece para cuidar da sua carreira.",min:18,ok:()=>S.money>=.5,o:[O("Trocar de agente",{cost:.5,fame:4,txt:"O novo agente abre portas e te coloca na mídia."}),O("Ficar com o atual",{mood:1,txt:"Lealdade vale mais que promessas."})]},
+{id:"marca",ic:"👕",t:"Linha de roupas própria",d:"Um amigo propõe lançar uma marca de roupas com o seu nome.",min:19,ok:()=>S.money>=1&&S.fame>=20,o:[O("Investir R$ 1M",{cost:1,risk:{p:.4,txt:"A marca não vingou e o investimento foi perdido.",fame:-1},deal:{n:"Marca de roupas",amt:.7,yrs:5},fame:3,txt:"A marca emplacou e gera renda todo ano."}),O("Só emprestar o nome",{money:.3,fame:1,txt:"Você ganhou um cachê sem arriscar nada."}),O("Recusar",{txt:"Você preferiu focar no futebol."})]},
+{id:"fas",ic:"🧒",t:"Torcedor mirim",d:"Um garoto doente sonha em conhecer você antes de um jogo.",o:[O("Receber e dar a camisa",{mood:8,fame:2,txt:"Um momento que você nunca vai esquecer."}),O("Mandar um vídeo",{mood:3,fame:1,txt:"A família agradeceu o carinho."}),O("Sem tempo",{mood:-4,txt:"Você ficou com peso na consciência."})]},
+{id:"selecao",ic:"🇧🇷",t:"Amistoso beneficente da seleção",d:"Convidam você para um amistoso de gala entre craques.",min:20,ok:()=>S.ovr>=72,o:[O("Jogar",{fame:5,mood:3,ovr:[-.2,.3],txt:"Você brilhou ao lado de grandes nomes."}),O("Poupar o corpo",{ovr:[.1,.1],txt:"Você preferiu descansar."})]},
+{id:"curso",ic:"🎓",t:"Estudos e carreira pós-futebol",d:"Você pensa em fazer um curso para o futuro.",min:19,o:[O("Cursar à distância",{cost:.2,mood:4,ovr:[-.1,.1],txt:"Você se preparou para a vida depois dos gramados."}),O("Focar só no futebol",{ovr:[.1,.1],txt:"Cada minuto é dedicado ao esporte."})]},
+{id:"camp",ic:"🏕️",t:"Camp de verão com um ídolo",d:"Um ex-craque oferece um camp intensivo de duas semanas.",ok:()=>S.money>=.3,o:[O("Participar",{cost:.3,ovr:[.8,.5],mood:2,txt:"Duas semanas que valeram um ano de treino."}),O("Pular",{txt:"Você aproveitou o tempo livre."})]},
+];
+function lifeInit(){S.money??=0;S.fame??=5;S.mood??=60;S.perks??={};S.deals??=[];S.seen??=[];S.q??=[]}
+function evtApply(o,tags){
+  const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+  if(o.cost){S.money-=o.cost;tags.push(`💰 −R$ ${o.cost}M`)}
+  if(o.money){S.money+=o.money;tags.push(`💰 +R$ ${o.money}M`)}
+  if(o.ovr){const d=o.ovr[0]+G()*o.ovr[1];S.ovr=clamp(S.ovr+d,40,97);if(Math.abs(d)>=.05)tags.push(`OVR ${d>=0?"+":""}${d.toFixed(1)}`)}
+  if(o.fame){S.fame=clamp(S.fame+o.fame,0,100);tags.push(`⭐ Fama ${o.fame>0?"+":""}${o.fame}`)}
+  if(o.mood){S.mood=clamp(S.mood+o.mood,0,100);tags.push(`😊 Moral ${o.mood>0?"+":""}${o.mood}`)}
+  if(o.perk){S.perks[o.perk]=1;tags.push(`${PERK[o.perk][0]} ${PERK[o.perk][1]}`)}
+  if(o.deal){S.deals.push({...o.deal});tags.push(`📝 ${o.deal.n}: R$ ${o.deal.amt}M/temp. por ${o.deal.yrs} anos`)}
+  if(o.fx)o.fx()}
+function evtResolve(o){const tags=[];let txt=o.txt||"";
+  const base={...o};delete base.risk;
+  if(o.risk&&Math.random()<o.risk.p){delete base.txt;if(o.risk.deal||o.risk.fx||o.risk.fame!=null||o.risk.mood!=null||o.risk.money!=null){}
+    if(o.cost){S.money-=o.cost;tags.push(`💰 −R$ ${o.cost}M`)}
+    if(o.perk){S.perks[o.perk]=1;tags.push(`${PERK[o.perk][0]} ${PERK[o.perk][1]}`)}
+    evtApply({...o.risk,txt:undefined,perk:undefined,cost:undefined},tags);txt=o.risk.txt||txt}
+  else evtApply(base,tags);
+  return{txt,tags}}
+function evtPick(){lifeInit();
+  const pool=EV.filter(e=>(!e.min||S.age>=e.min)&&(!e.ok||e.ok())&&!S.seen.includes(e.id)&&e.o.some(o=>!o.perk||!S.perks[o.perk]));
+  const n=S.age<16?1:S.fame>45?3:2,q=[];
+  while(q.length<n&&pool.length)q.push(pool.splice(Math.floor(Math.random()*pool.length),1)[0].id);
+  S.seen=[...S.seen,...q].slice(-14);return q}
+function evt(){S.q=evtPick();evtNext()}
+function evtNext(){lifeInit();const id=S.q.shift();if(!id)return offers();
+  const e=EV.find(x=>x.id==id);
+  show(`<h1>${e.ic} ${e.t}</h1><div class=card>${e.d}<div class=m style="margin-top:10px">💰 R$ ${S.money.toFixed(1)}M · ⭐ Fama ${Math.round(S.fame)} · 😊 Moral ${Math.round(S.mood)}</div></div>
+${e.o.map((o,j)=>(o.perk&&S.perks[o.perk])?"":`<button class="b o" ${o.cost&&S.money<o.cost?"disabled":""} onclick="evtChoose('${id}',${j})">${o.t}${o.cost?`<small>Custa R$ ${o.cost}M${S.money<o.cost?" · sem dinheiro":""}</small>`:""}</button>`).join("")}`)}
+function evtChoose(id,j){lifeInit();const e=EV.find(x=>x.id==id),o=e.o[j];if(o.cost&&S.money<o.cost)return;const r=evtResolve(o);sv();
+  show(`<h1>${e.ic} ${e.t}</h1><div class=card><b>${o.t}</b><p>${r.txt}</p><div class=chips style="padding:0">${r.tags.map(t=>`<span class=chip>${t}</span>`).join("")}</div></div><button class=b onclick=evtNext()>${S.q.length?"Próximo acontecimento":"Ver propostas"}</button>`)}
+function lifeCard(){lifeInit();
+  const bar=(l,v,c)=>`<div class=lf><span>${l}</span><div class=lu-bar><i style="width:${Math.max(3,Math.min(100,v))}%;background:${c}"></i></div><b>${Math.round(v)}</b></div>`;
+  const pk=Object.keys(S.perks).map(k=>`<span class="chip g">${PERK[k][0]} ${PERK[k][1]}</span>`).join(""),dl=S.deals.map(d=>`<span class=chip>📝 ${d.n} · R$ ${d.amt}M · ${d.yrs}a</span>`).join("");
+  return`<h2>Vida do atleta</h2><div class=card><div class=r><b>💰 R$ ${S.money.toFixed(1)}M</b><span class=m>patrimônio</span></div>${bar("⭐ Fama",S.fame,"#f4c95d")}${bar("😊 Moral",S.mood,S.mood>=60?"var(--accent)":S.mood>=35?"#f4c95d":"#f87171")}${pk||dl?`<div class=chips style="padding:10px 0 0">${pk}${dl}</div>`:`<div class=m style="margin-top:8px">Sem bens nem contratos ainda. Eventos da temporada trazem oportunidades.</div>`}</div>`}
 function card(x,i,tp,lab){const f=x.c!=S.nat;return`<div class=card><div class=r><b>${x.n}</b><span class=s>${st(x.avg)}</span></div><div class=m>${x.lg} · ${x.c}${f?" 🌍":""} · média ${x.avg}</div><button class=b onclick="pick(${i},'${tp}')">${lab}</button></div>`}
 function offers(){if(S.age+1>=41)return end();
 if(S.age+1<16){const t=S.team;return show(`<h1>Fim da temporada ${S.year}</h1>${hd()}<div class=card><h2 style="margin-top:0">🧒 Categoria de base</h2><div>Você tem ${S.age} anos e segue na base do <b>${t.n}</b>. Só é possível assinar com outro clube a partir dos <b>16 anos</b>.</div><div class=m style="margin-top:8px">Primeiras propostas no fim da temporada ${S.year+(15-S.age)}, quando você tiver 15 anos.</div></div><button class=b onclick="pick(-2,'stay')">▶ Seguir na base (${S.age+1} anos em ${S.year+1})</button>`)}
-const ob=DIFF[S.diff]?.offerBonus||0;let base=T.filter(x=>x!==S.team&&Math.abs(x.avg-(S.ovr+ob))<=9);if(base.length<5)base=T.filter(x=>x!==S.team).sort((p,q)=>Math.abs(p.avg-S.ovr)-Math.abs(q.avg-S.ovr)).slice(0,12);
+const ob=(DIFF[S.diff]?.offerBonus||0)+((S.fame??5)-30)*.05;let base=T.filter(x=>x!==S.team&&Math.abs(x.avg-(S.ovr+ob))<=9);if(base.length<5)base=T.filter(x=>x!==S.team).sort((p,q)=>Math.abs(p.avg-S.ovr)-Math.abs(q.avg-S.ovr)).slice(0,12);
 S.offs=sh(base).slice(0,5);
 S.loans=(S.age<=21&&(S.gain<2.5||S.ratio<.35)&&!S.parent)?sh(T.filter(x=>x!==S.team&&x.avg<S.team.avg&&x.avg>S.ovr-12&&x.avg<S.ovr+3)).slice(0,3):[];
 let h=`<h1>Fim da temporada ${S.year}</h1>${hd()}`;
@@ -1042,7 +1116,7 @@ Object.assign(window, {
   tr,
   go,
   evt,
-  evo,
+  evtChoose,evtNext,
   offers,
   end,
   home,
