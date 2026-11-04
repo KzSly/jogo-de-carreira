@@ -451,3 +451,6 @@ input, select { background: rgba(5,16,11,.8); }
 .lc-x { display: flex; justify-content: space-between; padding: 0 12px; color: var(--muted); font-size: 9px; }
 .tut-box { width: min(100%, 400px); padding: 24px; border: 1px solid var(--border); border-radius: 20px; background: var(--bg-soft); text-align: center; box-shadow: 0 30px 80px rgba(0,0,0,.6); animation: pop .35s cubic-bezier(.2,1.5,.4,1) both; display: flex; flex-direction: column; align-items: center; gap: 6px; }
 .tut-box h3 { margin: 8px 0 0; font: 800 26px "Barlow Condensed", sans-serif; text-transform: uppercase; } .tut-box p { margin: 4px 0 12px; color: var(--muted); font-size: 14px; line-height: 1.6; } .tut-box .b { margin: 0; } .tut-box > div:last-child { width: 100%; }
+.fz-ed .fz-c { border-style: dashed; opacity: .55; }
+.fz-edon .fz-c { opacity: 1; border-style: solid; border-color: var(--accent); background: rgba(49,223,131,.28); }
+.fz-edon .fz-c b { color: #fff; }
