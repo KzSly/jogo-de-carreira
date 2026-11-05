@@ -49,3 +49,26 @@ drop trigger if exists careers_set_updated_at on public.careers;
 create trigger careers_set_updated_at
   before update on public.careers
   for each row execute function public.set_updated_at();
+
+-- ===== Avaliações públicas (aparecem no menu inicial) =====
+-- Só avaliações com 3+ estrelas ficam visíveis: as ruins são ocultadas automaticamente.
+create table if not exists public.reviews (
+  id bigint generated always as identity primary key,
+  created_at timestamptz not null default now(),
+  name text not null check (char_length(name) between 1 and 30),
+  rating smallint not null check (rating between 1 and 5),
+  message text not null default '' check (char_length(message) <= 200),
+  mode text not null default 'jogador'
+);
+
+alter table public.reviews enable row level security;
+
+drop policy if exists "Anyone can read good reviews" on public.reviews;
+create policy "Anyone can read good reviews"
+  on public.reviews for select
+  using (rating >= 3);
+
+drop policy if exists "Anyone can send a review" on public.reviews;
+create policy "Anyone can send a review"
+  on public.reviews for insert
+  with check (rating >= 3 and char_length(message) <= 200);

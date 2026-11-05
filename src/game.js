@@ -182,7 +182,9 @@ if(A.me||B.me){const oth=A.me?B:A,sc=A.me?`${ga}-${gb}`:`${gb}-${ga}`;path.push(
 alive=nx;if(out)break}
 if(!res)res="Campeão";return{path,res,champ:res==="Campeão"}}
 function groupStage(me,opps){const rows=[row(me.n,me.avg,1),...opps.slice(0,3).map(o=>row(o.n,o.avg))];roundRobin(rows,1);return{rows,pos:rows.findIndex(r=>r.me)+1}}
-const $=document.getElementById("a"),show=h=>{const na=window._na;window._na=0;$.classList.toggle("noanim",!!na);$.innerHTML=h;scrollTo(0,0);if(!na){$.classList.remove("pg-in");void $.offsetWidth;$.classList.add("pg-in")}};
+const $=document.getElementById("a"),show=h=>{const na=window._na;window._na=0;const m=/<h1[^>]*>([^<]*)/.exec(h),k=m?m[1]:"",same=!!k&&k===window._h1,y=window.scrollY;window._h1=k;
+$.classList.toggle("noanim",!!na||same);$.innerHTML=h;
+if(same)scrollTo({top:y,behavior:"instant"});else{scrollTo({top:0,behavior:"instant"});if(!na){$.classList.remove("pg-in");void $.offsetWidth;$.classList.add("pg-in")}}};
 let S=null;
 function sv(){try{localStorage.setItem("cf1",JSON.stringify(S))}catch(e){}}
 function bind(x){return x&&(T.find(t=>t.n==x.n&&t.c==x.c)||x)}
@@ -325,19 +327,35 @@ S.hist.push({y,a,t:t.n,lg,g:gm,go:g,as,cs,ov:Math.round(S.ovr),th:H.length,loan:
 S.lastL=L;S.lastH=H;S.lastA=AW;S.comps=CP;S.compY=y;S.line=`Jogos ${gm} · ${S.pos=="Goleiro"?cs+" jogos sem sofrer gol":g+" gols · "+as+" assistências"}`;S.dl=`${Math.round(o0)} → ${Math.round(S.ovr)} (${gr>=0?"+":""}${gr.toFixed(1)})`;
 S.cele=[...H.map(n=>({n,t:"title"})),...AW.map(n=>({n,t:"award"}))];
 sv();return S.cele.length?cele(0):summ()}
-function cele(i){const list=S.cele||[];i=+i;
-if(i>=list.length)return summ();
-const c=list[i],[,col]=tk(c.n),multi=list.length>1;
-show(`<div class=cele style="--c1:${col[0]};--c2:${col[1]}">
-<div class=cele-bg></div><div class=cele-rays></div>
-<div class=cele-in>
-<div class=cele-kind>${c.t=="award"?"⭐ Prêmio individual":"🏆 Título conquistado"}</div>
-<img class=cele-img src="${tImg(c.n)}" alt="">
-<div class=cele-name>${c.n}</div>
-<div class=cele-sub>${c.t=="award"?S.name:S.team.n} · ${S.compY}</div>
+// ===== CELEBRAÇÃO DE TÍTULO (overlay em tela cheia) =====
+let _celeRaf=0,_celeFn=null;
+const noMotion=()=>{try{return matchMedia("(prefers-reduced-motion: reduce)").matches}catch(e){return false}};
+function celeClose(){cancelAnimationFrame(_celeRaf);_celeRaf=0;const el=document.getElementById("celeov");if(el)el.remove();document.body.classList.remove("noscroll")}
+function celeConfetti(cv,cols){const x=cv.getContext("2d"),dpr=Math.min(2,window.devicePixelRatio||1),W=cv.width=Math.round(innerWidth*dpr),H=cv.height=Math.round(innerHeight*dpr),P=[];let t=0;
+  const burst=(n,cx,cy)=>{for(let k=0;k<n;k++){const a=Math.random()*Math.PI*2,v=(3+Math.random()*9)*dpr;P.push({x:cx,y:cy,vx:Math.cos(a)*v,vy:Math.sin(a)*v-7*dpr,w:(5+Math.random()*5)*dpr,h:(8+Math.random()*7)*dpr,r:Math.random()*6,vr:(Math.random()-.5)*.45,c:cols[k%cols.length],life:0})}};
+  const step=()=>{x.clearRect(0,0,W,H);t++;
+    if(t==1)burst(150,W/2,H*.4);if(t==35)burst(70,W*.15,H*.55);if(t==50)burst(70,W*.85,H*.55);if(t>90&&t<330&&t%14==0)burst(10,Math.random()*W,-10);
+    for(let k=P.length-1;k>=0;k--){const p=P[k];p.vy+=.3*dpr;p.vx*=.992;p.vy*=.995;p.x+=p.vx;p.y+=p.vy;p.r+=p.vr;p.life++;
+      if(p.y>H+40||p.life>260){P.splice(k,1);continue}
+      x.save();x.translate(p.x,p.y);x.rotate(p.r);x.fillStyle=p.c;x.globalAlpha=Math.max(0,Math.min(1,(260-p.life)/90));x.fillRect(-p.w/2,-p.h/2,p.w,p.h);x.restore()}
+    if(t<420||P.length)_celeRaf=requestAnimationFrame(step)};
+  step()}
+function celeOpen(o){const{list,i,sub,total,nth,done}=o;
+  if(i>=list.length){celeClose();return done()}
+  celeClose();const c=list[i],[,col]=tk(c.n),award=c.t=="award",multi=list.length>1,n=nth(c);
+  const meta=award?`<span class=chip>⭐ Prêmio individual</span>`:`<span class="chip g">${n<=1?"Primeira conquista!":n+"ª conquista"}</span><span class=chip>🏆 ${total()} ${total()==1?"título":"títulos"} na carreira</span>`;
+  const el=document.createElement("div");el.id="celeov";el.className="cele";el.style.setProperty("--c1",col[0]);el.style.setProperty("--c2",col[1]);
+  el.innerHTML=`<div class=cele-bg></div><div class=cele-rays></div><canvas class=cele-cv></canvas>
+<div class=cele-in><div class=cele-kind>${award?"⭐ Prêmio individual":"🏆 Campeão!"}</div>
+<div class=cele-stage><div class=cele-glow></div><div class=cele-shine><img class=cele-img src="${tImg(c.n)}" alt=""></div><i class="cele-sp s1"></i><i class="cele-sp s2"></i><i class="cele-sp s3"></i><i class="cele-sp s4"></i></div>
+<div class=cele-name>${c.n}</div><div class=cele-sub>${sub(c)}</div><div class=cele-meta>${meta}</div>
 ${multi?`<div class=cele-dots>${list.map((_,j)=>`<span class="${j==i?"on":""}"></span>`).join("")}</div>`:""}
-<button class="b cele-btn" onclick="cele(${i+1})">${i+1<list.length?`Próximo (${i+2}/${list.length})`:"Continuar"}</button>
-</div></div>`)}
+<button class="b cele-btn" onclick="celeNext(${i+1})">${i+1<list.length?`Próximo (${i+2}/${list.length})`:"Continuar"}</button></div>`;
+  document.body.appendChild(el);document.body.classList.add("noscroll");
+  _celeFn=k=>celeOpen({...o,i:k});
+  if(!noMotion())celeConfetti(el.querySelector(".cele-cv"),[col[0],col[1],"#ffffff","#31df83","#f4c95d"])}
+function celeNext(k){if(_celeFn)_celeFn(+k)}
+function cele(i){celeOpen({list:S.cele||[],i:+i,sub:c=>(c.t=="award"?S.name:S.team.n)+" · "+S.compY,total:()=>S.titles.length,nth:c=>S.titles.filter(t=>t.n==c.n).length,done:()=>summ()})}
 function summ(){const L=S.lastL||[],H=S.lastH||[],AW=S.lastA||[];
 show(`<h1>Resumo ${S.compY}</h1>${hd()}
 <div class=card><h2 style="margin-top:0">Campanha</h2>${L.map(x=>`<div class=li>${x}</div>`).join("")}</div>
@@ -461,6 +479,7 @@ show(`<h1>🏁 Fim de carreira</h1><div class=card><b>${S.name}</b> #${S.num} ·
 <h2>Estatísticas</h2><div class=card>Jogos: <b>${J}</b><br>${S.pos=="Goleiro"?`Jogos sem sofrer gol: <b>${C}</b>`:`Gols: <b>${Gl}</b> · Assistências: <b>${A}</b>`}<br>Títulos: <b>${S.titles.length}</b><br>Lesões: <b>${I}</b></div>
 <h2>🏆 Títulos</h2><div class=card>${nt.length?nt.map(n=>`<div class=r><span style="display:flex;align-items:center;gap:8px"><img src="${tImg(n)}" width=44 height=44 alt="">${n}</span><b>${tt[n]}× <span class=m>${S.titles.filter(t=>t.n==n).map(t=>t.y).join(", ")}</span></b></div>`).join(""):"Nenhum título conquistado."}</div>
 <h2>⭐ Prêmios individuais</h2><div class=card>${Object.keys(aa).length?Object.keys(aa).map(n=>`<div class=r><span style="display:flex;align-items:center;gap:8px"><img src="${tImg(n)}" width=44 height=44 alt="">${n}</span><b>${aa[n].length}× <span class=m>${aa[n].join(", ")}</span></b></div>`).join(""):"Nenhum prêmio individual."}</div><h2>Times</h2><div class="card sc"><table><tr><th>Time</th><th>Anos</th><th>J</th><th>${S.pos=="Goleiro"?"SG":"G/A"}</th></tr>${Object.keys(sp).map(k=>{const s=sp[k];return`<tr><td>${k}</td><td>${s.y[0]}${s.y.length>1?"–"+s.y[s.y.length-1]:""}</td><td>${s.g}</td><td>${S.pos=="Goleiro"?s.cs:s.go+"/"+s.as}</td></tr>`}).join("")}</table></div>
+${reviewCard("jogador",S.name)}
 <button class=b onclick=careerForm()>Nova carreira</button><button class="b o" onclick=home()>← Menu inicial</button>`)}
 // ===== MENU INICIAL =====
 const hasSave=()=>{try{return!!localStorage.getItem("cf1")}catch(e){return false}};
@@ -470,8 +489,7 @@ show(`<div class=hero><div class=hero-ball>⚽</div><div class=hero-tag>Simulado
 <h2>Escolha o modo</h2>
 <button class=mode onclick=careerForm()><span class=mode-ico>🏆</span><span class=mode-body><span class=mode-t>Modo Carreira Jogador</span><span class=mode-d>Crie seu jogador, escolha um ídolo e viva até 25 temporadas: treinos, lesões, transferências, títulos e prêmios individuais.</span></span><span class=mode-go>→</span></button>
 ${hasSave()?`<button class="b o" onclick=resume()>▶ Continuar carreira de jogador salva</button>`:""}
-<button class=mode onclick=mgSetup()><span class=mode-ico>📋</span><span class=mode-body><span class=mode-t>Modo Carreira Técnico <em class=new>NOVO</em></span><span class=mode-d>Crie seu próprio clube ou assuma um time da Série A do Brasileirão: defina reforços, escolha a tática da temporada e dispute Brasileirão, Copa do Brasil e Libertadores.</span></span><span class=mode-go>→</span></button>
-${hasSaveMg()?`<button class="b o" onclick=mgResume()>▶ Continuar carreira de técnico salva</button>`:""}
+<div class="mode lock"><span class=mode-ico>🔒</span><span class=mode-body><span class=mode-t>Modo Carreira Técnico <em class=new>EM BREVE</em></span><span class=mode-d>Em manutenção: estamos resolvendo bugs para voltar mais completo. Em breve você poderá comandar um clube do Brasileirão.</span></span></div>
 <h2>Conheça o jogo <span class=m>(arraste para o lado)</span></h2>
 <div class=cs onscroll="csDot(this)">
 <div class=cs-s><span class=cs-i>🏆</span><b>Carreira de jogador</b><p>Comece aos 14 anos na base, escolha um ídolo e uma super habilidade e evolua por até 25 temporadas. Treine atributos, gerencie lesões, receba propostas de clubes do mundo todo e dispute ligas, copas nacionais, torneios continentais e a Copa do Mundo.</p></div>
@@ -487,12 +505,12 @@ ${hasSaveMg()?`<button class="b o" onclick=mgResume()>▶ Continuar carreira de 
 <div class=kpis style="margin:0 0 12px"><div class=lu-t><span>Seleções</span><b class=lu-big>${nNat}</b></div><div class=lu-t><span>Campeonatos</span><b class=lu-big>${nLg}</b></div><div class=lu-t><span>Clubes</span><b class=lu-big>${T.length}</b></div><div class=lu-t><span>Dificuldades</span><b class=lu-big>3</b></div></div>
 <div class=chips style="padding:0"><span class=chip>Funciona no celular</span><span class=chip>Sem anúncios</span><span class=chip>Salva automático</span><span class=chip>Jogo grátis</span></div>
 <p class=m style="margin:12px 0 0">Seu progresso é salvo automaticamente neste navegador. Crie uma conta de graça se quiser guardar carreiras na nuvem e acessá-las de qualquer aparelho.</p></div>
-<h2>Backup e ajuda</h2>
-<div class=card><div class=m style="margin-bottom:9px">Salve sua carreira em um arquivo ou restaure uma anterior.</div><div class=g><button class="b o" onclick="dlSave('pl')">💾 Exportar jogador</button><button class="b o" onclick="dlSave('mg')">💾 Exportar técnico</button><label class="b o fl">📂 Importar carreira<input type=file accept=".json,application/json" hidden onchange="impSave(this)"></label></div><button class="b o" onclick=tutOpen(0)>❓ Como jogar (tutorial do modo técnico)</button></div>
+<h2>O que dizem os jogadores</h2>
+<div class=card id=rvcard><div id=rvlist><div class=m>Carregando avaliações…</div></div></div>
 <h2>Autores</h2>
-<div class="card authors"><div class=author><span class=av>S</span><div><b>Slyvok</b><div class=m>Idealização e desenvolvimento</div></div></div><div class=author><span class=av>Z</span><div><b>Zacz</b><div class=m>Idealização e desenvolvimento</div></div></div><div class=author><span class=av>G</span><div><b>Gabz</b><div class=m>Idealização</div></div></div></div>
-<div class=made>Feito por <b>Slyvok</b>, <b>Zacz</b> e <b>Gabz</b></div>
-<div class=copy>© ${new Date().getFullYear()} SlyProductions. Todos os direitos reservados.</div>`)}
+<div class="card authors"><div class=author><span class=av>H</span><div><b>Henrique</b><div class=m>Idealização e desenvolvimento</div></div></div><div class=author><span class=av>I</span><div><b>Isaac</b><div class=m>Idealização e desenvolvimento</div></div></div><div class=author><span class=av>G</span><div><b>Gabz</b><div class=m>Idealização</div></div></div></div>
+<div class=made>Feito por <b>Henrique</b>, <b>Isaac</b> e <b>Gabz</b></div>
+<div class=copy>© ${new Date().getFullYear()} SlyProductions. Todos os direitos reservados.</div>`);loadReviews()}
 
 // ===== MODO CARREIRA TÉCNICO =====
 let M=null,MT={};
@@ -561,8 +579,8 @@ function mgSv(){try{localStorage.setItem("cf2",JSON.stringify(M))}catch(e){}}
 function mgBindClub(){if(!M.club)return;
 if(M.own){let t=T.find(x=>x.n==M.club.n&&x.c=="Brasil");if(!t){t=M.club;T.push(t)}M.club=t}
 else{const t=T.find(x=>x.n==M.club.n&&x.c==M.club.c);if(t)M.club=t}}
-function mgResume(){try{M=JSON.parse(localStorage.getItem("cf2"));rct(M.squad.filter(p=>p.ct==null));mgBindClub();M.fired?mgSumm():mgSeason()}catch(e){home()}}
-function mgSetup(){
+function mgResume(){if(MG_LOCKED)return mgMaint();try{M=JSON.parse(localStorage.getItem("cf2"));rct(M.squad.filter(p=>p.ct==null));mgBindClub();M.fired?mgSumm():mgSeason()}catch(e){home()}}
+function mgSetup(){if(MG_LOCKED)return mgMaint();
 show(`<h1>Carreira Técnico</h1><p class=m>Assuma o comando: crie seu próprio clube do zero ou pegue um time pronto da Série A do Brasileirão.</p>
 <div class=card><label>Nome do técnico</label><input id=mgnm placeholder="Seu nome"></div>
 <h2>Dificuldade</h2>
@@ -884,14 +902,7 @@ M.lastL=L;M.lastH=H;M.comps=CP;M.compY=y;M.verdict=verdict;M.fired=fired;
 T.forEach(x=>{if(x===t)return;x.b0=x.b0??x.avg;x.avg=Math.round(Math.max(x.b0-6,Math.min(x.b0+6,x.avg+G()*1.2+(x.b0-x.avg)*.15)))});M.squad=ageSquad(M.squad,t.avg+M.base*.6);M.market=null;M.youth=null;M.derby=null;M.rival=null;
 M.cele=H.map(n=>({n}));M.year++;M.seasons++;M.left=5;M.inv={};mgSv();
 return M.cele.length?mgCele(0):mgSumm()}
-function mgCele(i){const list=M.cele||[];i=+i;if(i>=list.length)return mgSumm();
-const c=list[i],[,col]=tk(c.n),multi=list.length>1;
-show(`<div class=cele style="--c1:${col[0]};--c2:${col[1]}"><div class=cele-bg></div><div class=cele-rays></div><div class=cele-in>
-<div class=cele-kind>🏆 Título conquistado</div><img class=cele-img src="${tImg(c.n)}" alt=""><div class=cele-name>${c.n}</div>
-<div class=cele-sub>${M.club.n} · ${M.compY}</div>
-${multi?`<div class=cele-dots>${list.map((_,j)=>`<span class="${j==i?"on":""}"></span>`).join("")}</div>`:""}
-<button class="b cele-btn" onclick="mgCele(${i+1})">${i+1<list.length?`Próximo (${i+2}/${list.length})`:"Continuar"}</button>
-</div></div>`)}
+function mgCele(i){celeOpen({list:M.cele||[],i:+i,sub:()=>M.club.n+" · "+M.compY,total:()=>M.titles.length,nth:c=>M.titles.filter(t=>t.n==c.n).length,done:()=>mgSumm()})}
 function mgSumm(){const L=M.lastL||[],H=M.lastH||[];
 show(`<h1>Fim de temporada ${M.compY}</h1>${mgHd()}
 <div class=card><h2 style="margin-top:0">Campanha</h2>${L.map(x=>`<div class=li>${x}</div>`).join("")}</div>
@@ -925,6 +936,7 @@ show(`<h1>🏁 Fim de carreira técnica</h1><div class=card><b>${M.coach}</b><br
 <h2>Estatísticas</h2><div class=card>Acessos conquistados: <b>${promo}</b><br>Rebaixamentos sofridos: <b>${releg}</b><br>Títulos: <b>${M.titles.length}</b></div>
 <h2>🏆 Títulos</h2><div class=card>${nt.length?nt.map(n=>`<div class=r><span style="display:flex;align-items:center;gap:8px"><img src="${tImg(n)}" width=44 height=44 alt="">${n}</span><b>${tt[n]}× <span class=m>${M.titles.filter(t=>t.n==n).map(t=>t.y).join(", ")}</span></b></div>`).join(""):"Nenhum título conquistado."}</div>
 ${mgCharts()}
+${reviewCard("tecnico",M.coach)}
 <button class=b onclick=mgSetup()>Nova carreira técnica</button><button class="b o" onclick=home()>← Menu inicial</button>`)}
 // ===== CONTA, LOGIN E CARREIRAS NA NUVEM =====
 let AU=null;
@@ -1097,6 +1109,37 @@ function dlSave(kind){const k=kind=="mg"?"cf2":"cf1";let v=null;try{v=localStora
 function impSave(inp){const f=inp.files&&inp.files[0];if(!f)return;const r=new FileReader();
   r.onload=()=>{try{const d=JSON.parse(r.result),mg=d&&Array.isArray(d.squad)&&d.formation,pl=d&&Array.isArray(d.hist)&&d.pos&&d.team;if(!mg&&!pl)throw 0;
     localStorage.setItem(mg?"cf2":"cf1",JSON.stringify(d));mg?mgResume():resume()}catch(e){alert("Arquivo de carreira inválido.")}};r.readAsText(f)}
+// ===== AVALIAÇÕES DOS JOGADORES =====
+const MG_LOCKED=true;
+function mgMaint(){show(`<h1>🛠️ Modo Técnico</h1><div class="card mt"><span class=mt-ico>🚧</span><b>Em manutenção</b><p>Estamos corrigindo bugs e ajustando o equilíbrio do modo treinador. Ele volta em breve, mais completo.</p><span class=chip>Em breve</span></div><button class="b o" onclick=home()>← Voltar ao menu</button>`)}
+const RV_KEY="cf_reviews",BAD=/(merd|porra|caralh|fdp|puta|buceta|viado|vtnc|vsf|arrombad|idiot|lixo|golpe|fraude)/i;
+const esc=s=>String(s==null?"":s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const starsOf=n=>"★".repeat(n)+"☆".repeat(5-n);
+let _rvR=0;
+const rvLocal=()=>{try{return JSON.parse(localStorage.getItem(RV_KEY)||"[]")}catch(e){return[]}};
+function reviewCard(mode,name){_rvR=0;
+  return`<h2>⭐ Avalie o jogo</h2><div class=card id=rvbox><div class=m>Gostou da experiência? Sua nota e seu comentário podem aparecer no menu inicial. Avaliações ruins ou com xingamentos são removidas automaticamente.</div>
+<div class=rv-stars>${[1,2,3,4,5].map(n=>`<button type=button class=rv-s data-n=${n} onclick="rvStar(${n})">★</button>`).join("")}</div>
+<input id=rvn maxlength=30 placeholder="Seu nome" value="${esc(name||"")}">
+<textarea id=rvm maxlength=200 rows=3 placeholder="Escreva sua avaliação (opcional)"></textarea>
+<div id=rverr class=m style="color:#ff8a85"></div><button class=b onclick="rvSend('${mode}')">Enviar avaliação</button></div>`}
+function rvStar(n){_rvR=n;document.querySelectorAll(".rv-s").forEach(b=>b.classList.toggle("on",+b.dataset.n<=n))}
+async function rvSend(mode){const er=document.getElementById("rverr"),name=(document.getElementById("rvn").value||"Jogador").trim().slice(0,30)||"Jogador",message=(document.getElementById("rvm").value||"").trim().slice(0,200);
+  if(_rvR<1){er.textContent="Escolha de 1 a 5 estrelas.";return}
+  const rec={name,rating:_rvR,message,mode,created_at:new Date().toISOString()},publish=_rvR>=3&&!BAD.test(name+" "+message);
+  let ok=false;
+  if(publish){if(hasAuth){try{const{error}=await supabase.from("reviews").insert({name,rating:rec.rating,message,mode});ok=!error}catch(e){}}
+    if(!ok){const l=rvLocal();l.unshift(rec);try{localStorage.setItem(RV_KEY,JSON.stringify(l.slice(0,30)))}catch(e){}}}
+  const box=document.getElementById("rvbox");
+  if(box)box.innerHTML=`<b>Obrigado pela avaliação! ${starsOf(_rvR)}</b><p class=m>${publish?"Seu comentário vai aparecer no menu inicial.":"Recebemos o seu feedback. Ele não será exibido publicamente."}</p>`}
+async function loadReviews(){const el=document.getElementById("rvlist");if(!el)return;let list=[];
+  if(hasAuth){try{const{data,error}=await supabase.from("reviews").select("name,rating,message,created_at").gte("rating",3).order("created_at",{ascending:false}).limit(40);if(!error&&data)list=data}catch(e){}}
+  if(!list.length)list=rvLocal();
+  list=list.filter(r=>r.rating>=3&&!BAD.test((r.message||"")+" "+(r.name||"")));
+  const el2=document.getElementById("rvlist");if(!el2)return;
+  if(!list.length){el2.innerHTML=`<div class=m>Ainda não há avaliações. Termine uma carreira e seja o primeiro a avaliar!</div>`;return}
+  const avg=list.reduce((s,r)=>s+r.rating,0)/list.length;
+  el2.innerHTML=`<div class=rv-top><b>${avg.toFixed(1)}</b><span class=rv-st>${starsOf(Math.round(avg))}</span><span class=m>${list.length} avaliações</span></div><div class=rv-grid>${list.slice(0,6).map(r=>`<div class=rv-c><div class=r><b>${esc(r.name)}</b><span class=rv-st>${starsOf(r.rating)}</span></div>${r.message?`<p>${esc(r.message)}</p>`:`<p class=m>Sem comentário.</p>`}</div>`).join("")}</div>`}
 function csDot(el){const i=Math.round(el.scrollLeft/(el.firstElementChild.offsetWidth+10));document.querySelectorAll("#cs-dots i").forEach((d,k)=>d.classList.toggle("on",k==i))}
 (function(){let sx=0,sy=0,ok=0;const A=document.getElementById("a");
 A.addEventListener("touchstart",e=>{const t=e.touches[0];sx=t.clientX;sy=t.clientY;ok=!e.target.closest(".cs,input,select,.sc,#lu-field,.lu-sheet")},{passive:true});
@@ -1106,6 +1149,8 @@ document.addEventListener("pointermove",e=>{if(dn&&cs)cs.scrollLeft=l0-(e.client
 document.addEventListener("pointerup",()=>{if(cs)cs.classList.remove("drag");dn=0;cs=null});
 document.addEventListener("keydown",e=>{if(e.key!="ArrowRight"&&e.key!="ArrowLeft")return;if(/INPUT|SELECT|TEXTAREA/.test(document.activeElement.tagName))return;const on=A.querySelector(".tab.on");if(!on)return;const nx=e.key=="ArrowRight"?on.nextElementSibling:on.previousElementSibling;if(nx)nx.click()})})();
 Object.assign(window, {
+  rvStar,rvSend,mgMaint,
+  celeNext,celeClose,
   csDot,
   luToggle,luEditT,luEditDone,mgLineupEdit,
   mgContracts,mgRenew,mgAcademy,mgPromote,mgYouthRefresh,mgDerby,lvGo,lvSkip,lvTac,lvSub,lvFinish,tutOpen,dlSave,impSave,

@@ -188,29 +188,6 @@ button, input, select { -webkit-tap-highlight-color: transparent; }
 .ko-s small { color: var(--muted); font-size: 9px; }
 .ko-r.out .ko-s { color: #ff8a85; }
 
-/* ---------- comemoração de título ---------- */
-.cele { position: fixed; inset: 0; z-index: 60; display: grid; place-items: center; padding: 24px; overflow: hidden; }
-.cele-bg { position: absolute; inset: 0; background: radial-gradient(ellipse at 50% 38%, var(--c1), var(--c2) 45%, #06100c 78%); opacity: .5; }
-.cele-rays {
-  position: absolute; top: 38%; left: 50%; width: 180vmax; height: 180vmax;
-  background: repeating-conic-gradient(from 0deg, rgba(255,255,255,.13) 0deg 7deg, transparent 7deg 18deg);
-  transform: translate(-50%,-50%); animation: spin 26s linear infinite; opacity: .35;
-  -webkit-mask-image: radial-gradient(circle, #000 0%, transparent 62%);
-          mask-image: radial-gradient(circle, #000 0%, transparent 62%);
-}
-@keyframes spin { to { transform: translate(-50%,-50%) rotate(360deg); } }
-.cele-in { position: relative; width: min(100%, 420px); text-align: center; animation: pop .45s cubic-bezier(.2,1.5,.4,1) both; }
-@keyframes pop { from { opacity: 0; transform: scale(.78); } to { opacity: 1; transform: scale(1); } }
-.cele-kind { color: var(--accent-2); font-size: 11px; font-weight: 800; letter-spacing: .22em; text-transform: uppercase; }
-.cele-img { width: 148px; height: 148px; margin: 16px 0 6px; filter: drop-shadow(0 12px 34px rgba(0,0,0,.6)); animation: float 2.8s ease-in-out infinite; }
-@keyframes float { 50% { transform: translateY(-9px); } }
-.cele-name { font: 900 clamp(28px,8vw,42px)/1.05 "Barlow Condensed", Impact, sans-serif; letter-spacing: .01em; text-transform: uppercase; text-shadow: 0 4px 24px rgba(0,0,0,.6); }
-.cele-sub { margin-top: 8px; color: var(--muted); font-size: 13px; font-weight: 600; }
-.cele-dots { display: flex; justify-content: center; gap: 7px; margin: 18px 0 2px; }
-.cele-dots span { width: 7px; height: 7px; border-radius: 50%; background: rgba(255,255,255,.25); transition: .2s; }
-.cele-dots span.on { width: 20px; border-radius: 4px; background: var(--accent); }
-.cele-btn { margin-top: 20px; }
-@media (prefers-reduced-motion: reduce) { .cele-rays, .cele-img { animation: none !important; } }
 @media (min-width: 700px) {
   body { padding-top: 32px; }
   #a { width: min(100%, 680px); }
@@ -457,3 +434,50 @@ input, select { background: rgba(5,16,11,.8); }
 .lf { display: grid; grid-template-columns: 78px 1fr 28px; align-items: center; gap: 10px; margin-top: 10px; font-size: 13px; }
 .lf span { color: var(--muted); } .lf b { text-align: right; }
 .b small { display: block; }
+
+/* ---------- comemoração de título ---------- */
+.noscroll { overflow: hidden; }
+.cele { position: fixed; inset: 0; z-index: 200; display: grid; place-items: center; padding: 24px; overflow: hidden; background: #040b08; animation: celeIn .35s ease both; }
+@keyframes celeIn { from { opacity: 0; } to { opacity: 1; } }
+.cele-bg { position: absolute; inset: 0; background: radial-gradient(ellipse at 50% 36%, var(--c1), var(--c2) 42%, #040b08 80%); opacity: .55; animation: celeBg 3.2s ease-in-out infinite alternate; }
+@keyframes celeBg { from { opacity: .42; } to { opacity: .62; } }
+.cele-rays { position: absolute; top: 36%; left: 50%; width: 190vmax; height: 190vmax; background: repeating-conic-gradient(from 0deg, rgba(255,255,255,.16) 0deg 6deg, transparent 6deg 16deg); transform: translate(-50%,-50%); animation: celeSpin 30s linear infinite; opacity: .4; -webkit-mask-image: radial-gradient(circle, #000 0%, transparent 60%); mask-image: radial-gradient(circle, #000 0%, transparent 60%); }
+@keyframes celeSpin { to { transform: translate(-50%,-50%) rotate(360deg); } }
+.cele-cv { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+.cele-in { position: relative; width: min(100%, 440px); text-align: center; }
+.cele-kind { display: inline-block; padding: 6px 16px; border: 1px solid rgba(255,255,255,.25); border-radius: 100px; background: rgba(0,0,0,.3); color: #fff; font-size: 12px; font-weight: 800; letter-spacing: .24em; text-transform: uppercase; animation: celeUp .6s .15s cubic-bezier(.2,.9,.3,1) both; }
+.cele-stage { position: relative; display: grid; place-items: center; width: 220px; height: 220px; margin: 14px auto 4px; }
+.cele-glow { position: absolute; inset: 10px; border-radius: 50%; background: radial-gradient(circle, var(--c1) 0%, transparent 68%); filter: blur(10px); opacity: .75; animation: celeGlow 2.4s ease-in-out infinite alternate; }
+@keyframes celeGlow { from { transform: scale(.9); opacity: .5; } to { transform: scale(1.15); opacity: .9; } }
+.cele-shine { position: relative; overflow: hidden; animation: celeDrop 1s .25s cubic-bezier(.2,1.4,.4,1) both, float 3s 1.3s ease-in-out infinite; }
+.cele-shine::after { content: ""; position: absolute; inset: 0; background: linear-gradient(110deg, transparent 35%, rgba(255,255,255,.75) 50%, transparent 65%); transform: translateX(-130%); animation: celeShine 2.8s 1.2s ease-in-out infinite; mix-blend-mode: overlay; }
+@keyframes celeShine { 0% { transform: translateX(-130%); } 45%, 100% { transform: translateX(130%); } }
+@keyframes celeDrop { 0% { opacity: 0; transform: translateY(-160px) scale(.4) rotate(-12deg); } 60% { opacity: 1; transform: translateY(8px) scale(1.08) rotate(3deg); } 100% { opacity: 1; transform: none; } }
+@keyframes float { 50% { transform: translateY(-9px); } }
+.cele-img { display: block; width: 168px; height: 168px; filter: drop-shadow(0 14px 34px rgba(0,0,0,.65)); }
+.cele-sp { position: absolute; width: 12px; height: 12px; background: #fff; clip-path: polygon(50% 0, 62% 38%, 100% 50%, 62% 62%, 50% 100%, 38% 62%, 0 50%, 38% 38%); opacity: 0; animation: celeSp 2.2s ease-in-out infinite; }
+.cele-sp.s1 { top: 14%; left: 18%; animation-delay: 1s; } .cele-sp.s2 { top: 22%; right: 14%; animation-delay: 1.5s; width: 16px; height: 16px; } .cele-sp.s3 { bottom: 22%; left: 10%; animation-delay: 2s; } .cele-sp.s4 { bottom: 16%; right: 20%; animation-delay: 1.2s; }
+@keyframes celeSp { 0%, 100% { opacity: 0; transform: scale(.3) rotate(0); } 50% { opacity: 1; transform: scale(1) rotate(90deg); } }
+.cele-name { font: 900 clamp(30px, 9vw, 46px)/1.05 "Barlow Condensed", Impact, sans-serif; letter-spacing: .01em; text-transform: uppercase; text-shadow: 0 4px 24px rgba(0,0,0,.7); animation: celeZoom .6s .7s cubic-bezier(.2,1.5,.4,1) both; }
+@keyframes celeZoom { from { opacity: 0; transform: scale(.6); } to { opacity: 1; transform: none; } }
+.cele-sub { margin-top: 8px; color: rgba(255,255,255,.8); font-size: 14px; font-weight: 600; animation: celeUp .6s 1s ease both; }
+.cele-meta { display: flex; justify-content: center; flex-wrap: wrap; gap: 6px; margin-top: 12px; animation: celeUp .6s 1.2s ease both; }
+@keyframes celeUp { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+.cele-dots { display: flex; justify-content: center; gap: 7px; margin: 16px 0 2px; animation: celeUp .6s 1.3s ease both; }
+.cele-dots span { width: 7px; height: 7px; border-radius: 50%; background: rgba(255,255,255,.28); transition: .2s; } .cele-dots span.on { width: 22px; border-radius: 4px; background: var(--accent); }
+.cele-btn { margin-top: 18px; animation: celeUp .6s 1.5s ease both; }
+@media (prefers-reduced-motion: reduce) { .cele-rays, .cele-shine, .cele-glow, .cele-bg, .cele-sp { animation: none !important; } .cele-sp { opacity: 0; } }
+
+/* ===== avaliações e manutenção ===== */
+.mode.lock { display: flex; align-items: center; gap: 14px; margin: 10px 0; padding: 16px; border: 1px dashed var(--border); border-radius: 16px; background: rgba(255,255,255,.025); opacity: .72; cursor: not-allowed; filter: grayscale(.4); }
+.mode.lock .mode-ico { font-size: 26px; }
+.mt { text-align: center; padding: 28px 18px; } .mt b { display: block; margin: 8px 0 6px; font: 800 26px "Barlow Condensed", sans-serif; text-transform: uppercase; } .mt p { margin: 0 0 12px; color: var(--muted); } .mt-ico { font-size: 40px; }
+.rv-stars { display: flex; gap: 6px; margin: 12px 0 8px; }
+.rv-s { padding: 0; border: 0; background: none; color: rgba(255,255,255,.2); font-size: 38px; line-height: 1; cursor: pointer; transition: transform .12s, color .12s; }
+.rv-s:hover { transform: scale(1.15); } .rv-s.on { color: var(--gold); text-shadow: 0 0 14px rgba(244,201,93,.5); }
+textarea { display: block; width: 100%; margin: 5px 0 12px; padding: 12px 14px; border: 1px solid var(--border); border-radius: 11px; outline: none; resize: vertical; color: var(--text); background: rgba(5,16,11,.8); font: 500 15px Inter, sans-serif; }
+textarea:focus { border-color: var(--accent); box-shadow: var(--ring); }
+.rv-top { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; } .rv-top b { font: 800 34px "Barlow Condensed", sans-serif; color: var(--gold); }
+.rv-st { color: var(--gold); letter-spacing: 2px; white-space: nowrap; }
+.rv-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 10px; }
+.rv-c { padding: 12px 14px; border: 1px solid var(--border); border-radius: 12px; background: var(--surface); } .rv-c p { margin: 8px 0 0; font-size: 13px; line-height: 1.5; overflow-wrap: anywhere; }
